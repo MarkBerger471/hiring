@@ -57,16 +57,28 @@
 
         /* ─── Header ─── */
         .header {
-            background: linear-gradient(135deg, #0f1728 0%, #1849a9 50%, #1570ef 100%);
+            background: linear-gradient(135deg, #0a0f1e 0%, #0f1f4e 30%, #1849a9 60%, #2d7be5 100%);
             color: #fff;
-            padding: 0 48px;
-            height: 88px;
+            padding: 48px 48px 44px;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(ellipse at 30% 50%, rgba(255,255,255,0.04) 0%, transparent 60%),
+                        radial-gradient(ellipse at 70% 20%, rgba(255,255,255,0.06) 0%, transparent 50%);
+            pointer-events: none;
         }
 
         .header::after {
@@ -76,27 +88,37 @@
             left: 0;
             right: 0;
             height: 1px;
-            background: rgba(255,255,255,0.1);
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
         }
 
-        .header-center { display: flex; align-items: center; gap: 18px; text-align: center; }
-
-        .mb-star {
-            width: 44px; height: 44px;
-            flex-shrink: 0;
-        }
+        .header-center { position: relative; z-index: 1; }
 
         .header-title {
-            font-size: 1.4rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            letter-spacing: -0.02em;
+            letter-spacing: -0.03em;
+            line-height: 1.2;
+            margin-bottom: 8px;
+            background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.85) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
         }
 
         .header-subtitle {
-            font-size: 0.78rem;
-            opacity: 0.6;
-            font-weight: 400;
-            letter-spacing: 0.01em;
+            font-size: 1rem;
+            opacity: 0.55;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+
+        .header-line {
+            width: 48px;
+            height: 3px;
+            background: linear-gradient(90deg, rgba(255,255,255,0.6), rgba(255,255,255,0.1));
+            border-radius: 2px;
+            margin: 14px auto 0;
         }
 
         /* ─── Navigation ─── */
@@ -104,7 +126,7 @@
             background: var(--surface);
             border-bottom: 1px solid var(--border);
             position: sticky;
-            top: 88px;
+            top: 0;
             z-index: 90;
         }
 
@@ -170,15 +192,15 @@
 
         /* ─── Observer Bar ─── */
         .observer-bar {
-            background: var(--surface);
+            background: linear-gradient(135deg, var(--surface) 0%, var(--bg-subtle) 100%);
             border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px 32px;
-            margin-bottom: 28px;
+            border-radius: var(--radius-xl);
+            padding: 28px 36px;
+            margin-bottom: 32px;
             display: flex;
             align-items: center;
-            gap: 16px;
-            box-shadow: var(--shadow-sm);
+            gap: 18px;
+            box-shadow: var(--shadow-md);
         }
 
         .observer-icon {
@@ -283,17 +305,17 @@
         .card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            margin-bottom: 20px;
+            border-radius: var(--radius-xl);
+            margin-bottom: 24px;
             overflow: hidden;
-            box-shadow: var(--shadow-xs);
-            transition: box-shadow var(--transition);
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
         }
 
-        .card:hover { box-shadow: var(--shadow-sm); }
+        .card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 
         .card-header {
-            padding: 20px 28px;
+            padding: 24px 32px;
             border-bottom: 1px solid var(--border-light);
             display: flex;
             align-items: center;
@@ -301,12 +323,12 @@
         }
 
         .card-header h2 {
-            font-size: 0.95rem;
-            font-weight: 700;
-            letter-spacing: -0.01em;
+            font-size: 1.05rem;
+            font-weight: 800;
+            letter-spacing: -0.02em;
         }
 
-        .card-body { padding: 24px 28px; }
+        .card-body { padding: 28px 32px; }
 
         /* ─── Candidate Name ─── */
         .candidate-name-group {
@@ -505,10 +527,13 @@
         .summary-card {
             background: var(--surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px 28px;
-            box-shadow: var(--shadow-xs);
+            border-radius: var(--radius-xl);
+            padding: 28px 32px;
+            box-shadow: var(--shadow-sm);
+            transition: all var(--transition);
         }
+
+        .summary-card:hover { box-shadow: var(--shadow-md); transform: translateY(-1px); }
 
         .summary-card h3 {
             font-size: 0.78rem;
@@ -755,6 +780,7 @@
         <div>
             <div class="header-title">Interview Evaluation Panel</div>
             <div class="header-subtitle">Strategic Assistant – Operational & Financial Excellence, MBMTH</div>
+            <div class="header-line"></div>
         </div>
     </div>
 </div>
