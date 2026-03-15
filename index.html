@@ -7,6 +7,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <style>
         :root {
             --bg: #f0f2f5;
@@ -815,85 +817,89 @@
 <div class="toast" id="toast"></div>
 
 <script>
+// ─── Firebase Init ───
+firebase.initializeApp({
+    apiKey: "AIzaSyDtOpcPanoHTEaxyidGgBxsRLPSOanBtPc",
+    authDomain: "mbmth-hiring.firebaseapp.com",
+    databaseURL: "https://mbmth-hiring-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "mbmth-hiring"
+});
+const db = firebase.database();
+const dbRef = db.ref('evaluations');
+
+// ─── Categories & Config ───
 const CATEGORIES = [
-    {
-        id: 'strategic',
-        name: 'Strategic Thinking & Transformation',
-        desc: 'Ability to develop and execute strategic initiatives, build business cases, and drive transformation roadmaps.',
-        group: 'core'
-    },
-    {
-        id: 'analytical',
-        name: 'Analytical & Problem-Solving Skills',
-        desc: 'Structured thinking, data-driven analysis, ability to synthesize complex information into actionable insights.',
-        group: 'core'
-    },
-    {
-        id: 'operational',
-        name: 'Operational & Financial Excellence',
-        desc: 'Understanding of KPIs, cost structures, production efficiency, budgets, and performance management.',
-        group: 'core'
-    },
-    {
-        id: 'delivery',
-        name: 'Ability to Deliver Results',
-        desc: 'Track record of driving measurable outcomes, meeting deadlines, and achieving targets under pressure.',
-        group: 'core'
-    },
-    {
-        id: 'communication',
-        name: 'Communication & Presentation',
-        desc: 'Executive-level presentation skills, clarity in English and Thai, ability to prepare decision papers.',
-        group: 'interpersonal'
-    },
-    {
-        id: 'project',
-        name: 'Project Management & Execution',
-        desc: 'Cross-functional coordination, structured tracking and reporting, ownership mindset.',
-        group: 'interpersonal'
-    },
-    {
-        id: 'leadership',
-        name: 'Leadership Potential',
-        desc: 'Vision, initiative, ability to influence and guide others, strategic decision-making capability.',
-        group: 'interpersonal'
-    },
-    {
-        id: 'cultural_fit',
-        name: 'Cultural Fit & Team Adaptability',
-        desc: 'Professional integrity, discretion, maturity, ability to integrate into and collaborate with the existing team, alignment with company values.',
-        group: 'fit'
-    },
-    {
-        id: 'sustainability',
-        name: 'Sustainability & ESG Awareness',
-        desc: 'Knowledge of ESG frameworks, energy efficiency, CO2 reduction, environmental compliance.',
-        group: 'fit'
-    }
+    { id: 'strategic', name: 'Strategic Thinking & Transformation', desc: 'Ability to develop and execute strategic initiatives, build business cases, and drive transformation roadmaps.', group: 'core' },
+    { id: 'analytical', name: 'Analytical & Problem-Solving Skills', desc: 'Structured thinking, data-driven analysis, ability to synthesize complex information into actionable insights.', group: 'core' },
+    { id: 'operational', name: 'Operational & Financial Excellence', desc: 'Understanding of KPIs, cost structures, production efficiency, budgets, and performance management.', group: 'core' },
+    { id: 'delivery', name: 'Ability to Deliver Results', desc: 'Track record of driving measurable outcomes, meeting deadlines, and achieving targets under pressure.', group: 'core' },
+    { id: 'communication', name: 'Communication & Presentation', desc: 'Executive-level presentation skills, clarity in English and Thai, ability to prepare decision papers.', group: 'interpersonal' },
+    { id: 'project', name: 'Project Management & Execution', desc: 'Cross-functional coordination, structured tracking and reporting, ownership mindset.', group: 'interpersonal' },
+    { id: 'leadership', name: 'Leadership Potential', desc: 'Vision, initiative, ability to influence and guide others, strategic decision-making capability.', group: 'interpersonal' },
+    { id: 'cultural_fit', name: 'Cultural Fit & Team Adaptability', desc: 'Professional integrity, discretion, maturity, ability to integrate into and collaborate with the existing team, alignment with company values.', group: 'fit' },
+    { id: 'sustainability', name: 'Sustainability & ESG Awareness', desc: 'Knowledge of ESG frameworks, energy efficiency, CO2 reduction, environmental compliance.', group: 'fit' }
 ];
 
-const GROUPS = {
-    core: 'Core Competencies',
-    interpersonal: 'Communication & Leadership',
-    fit: 'Fit & Awareness'
-};
-
+const GROUPS = { core: 'Core Competencies', interpersonal: 'Communication & Leadership', fit: 'Fit & Awareness' };
 const CANDIDATES = ['candidate1', 'candidate2', 'candidate3', 'candidate4'];
 const CANDIDATE_LABELS = ['Krichasorn Jamnong', 'Panjapat Lerdwisarnphob', 'Chariya Chaihao', 'Natchayada Katekaew'];
 const COLORS = ['#1570ef', '#ef6820', '#17b26a', '#7a5af8'];
 
 let currentSection = 'candidate1';
 let observerName = '';
+let cachedData = { observers: {} };
+let saveTimer = null;
 
+// ─── Firebase Data Layer ───
 function getData() {
-    const d = localStorage.getItem('mbmth_eval_data_v2');
-    return d ? JSON.parse(d) : { observers: {} };
+    return cachedData;
 }
 
-function saveData(data) {
-    localStorage.setItem('mbmth_eval_data_v2', JSON.stringify(data));
+function pushToFirebase() {
+    if (!observerName) return;
+    const obsData = cachedData.observers[observerName];
+    if (obsData) {
+        db.ref('evaluations/observers/' + encodeObserverKey(observerName)).set(obsData);
+    }
 }
 
+function encodeObserverKey(name) {
+    return name.replace(/[.#$/\[\]]/g, '_');
+}
+
+function decodeObserverKey(key) {
+    return key;
+}
+
+// Listen for real-time updates from all observers
+dbRef.on('value', (snapshot) => {
+    const val = snapshot.val();
+    if (val) {
+        cachedData = val;
+        // Re-map observer keys back to display names from their data
+        if (cachedData.observers) {
+            const remapped = {};
+            Object.keys(cachedData.observers).forEach(key => {
+                const obsData = cachedData.observers[key];
+                remapped[key] = obsData;
+            });
+            cachedData.observers = remapped;
+        }
+    } else {
+        cachedData = { observers: {} };
+    }
+
+    // Update UI if on summary
+    if (currentSection === 'summary') {
+        buildSummary();
+    }
+    // Update tab indicators
+    if (observerName) {
+        updateTabIndicators();
+    }
+});
+
+// ─── UI Functions ───
 function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
@@ -914,7 +920,7 @@ function setObserver() {
     buildSections();
     loadObserverData();
     showSection('candidate1');
-    showToast('Welcome, ' + name);
+    showToast('Welcome, ' + name + ' — syncing live');
 }
 
 function buildSections() {
@@ -925,7 +931,6 @@ function buildSections() {
         html += `<div class="section${ci === 0 ? ' active' : ''}" id="section-${cid}">`;
         html += `<div class="card"><div class="card-header"><h2>${CANDIDATE_LABELS[ci]}</h2></div>`;
         html += `<div class="card-body">`;
-
         html += `<input type="hidden" id="name-${cid}" value="${CANDIDATE_LABELS[ci]}"/>`;
 
         let currentGroup = '';
@@ -934,7 +939,6 @@ function buildSections() {
                 currentGroup = cat.group;
                 html += `<div class="category-group-label">${GROUPS[cat.group]}</div>`;
             }
-
             html += `<div class="category-row">`;
             html += `<div class="category-info"><h3>${cat.name}</h3><p>${cat.desc}</p></div>`;
             html += `<div class="rating-pills" id="stars-${cid}-${cat.id}">`;
@@ -942,14 +946,14 @@ function buildSections() {
                 html += `<div class="pill" data-value="${i}" onclick="setRating('${cid}','${cat.id}',${i})">${i}</div>`;
             }
             html += `</div>`;
-            html += `<textarea class="comment-field" id="comment-${cid}-${cat.id}" placeholder="Add comments..." oninput="autoSave()"></textarea>`;
+            html += `<textarea class="comment-field" id="comment-${cid}-${cat.id}" placeholder="Add comments..." oninput="debouncedSave()"></textarea>`;
             html += `</div>`;
         });
 
         html += `<div class="overall-section">`;
         html += `<label>Overall Assessment</label>`;
         html += `<p class="field-hint">Overall impression, recommendation, key strengths, concerns or red flags</p>`;
-        html += `<textarea class="overall-textarea" id="overall-${cid}" placeholder="Write your overall assessment..." oninput="autoSave()"></textarea>`;
+        html += `<textarea class="overall-textarea" id="overall-${cid}" placeholder="Write your overall assessment..." oninput="debouncedSave()"></textarea>`;
         html += `</div>`;
 
         html += `</div></div>`;
@@ -970,7 +974,7 @@ function setRating(cid, catId, value) {
         if (v <= value) s.classList.add('selected');
         else s.classList.remove('selected');
     });
-    autoSave();
+    collectAndSave();
 }
 
 function getRating(cid, catId) {
@@ -980,10 +984,16 @@ function getRating(cid, catId) {
     return selected.length > 0 ? parseInt([...selected].pop().dataset.value) : 0;
 }
 
-function autoSave() {
-    const data = getData();
+function debouncedSave() {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(collectAndSave, 600);
+}
+
+function collectAndSave() {
     if (!observerName) return;
-    if (!data.observers[observerName]) data.observers[observerName] = { timestamp: new Date().toISOString(), candidates: {} };
+    const key = encodeObserverKey(observerName);
+    if (!cachedData.observers) cachedData.observers = {};
+    if (!cachedData.observers[key]) cachedData.observers[key] = { timestamp: '', candidates: {} };
 
     CANDIDATES.forEach(cid => {
         const cData = { name: '', ratings: {}, comments: {}, overall: '' };
@@ -998,46 +1008,47 @@ function autoSave() {
 
         const overallEl = document.getElementById(`overall-${cid}`);
         if (overallEl) cData.overall = overallEl.value;
-        data.observers[observerName].candidates[cid] = cData;
+        cachedData.observers[key].candidates[cid] = cData;
     });
 
-    data.observers[observerName].timestamp = new Date().toISOString();
-    saveData(data);
+    cachedData.observers[key].timestamp = new Date().toISOString();
+    cachedData.observers[key].displayName = observerName;
+    pushToFirebase();
     updateTabIndicators();
 }
 
 function saveCandidate(cid) {
-    autoSave();
-    showToast('Evaluation saved');
+    collectAndSave();
+    showToast('Evaluation saved & synced');
 }
 
 function clearCandidate(cid) {
     if (!confirm('Clear all ratings and comments for this candidate?')) return;
-    document.getElementById(`name-${cid}`).value = '';
+    document.getElementById(`name-${cid}`).value = CANDIDATE_LABELS[CANDIDATES.indexOf(cid)];
     CATEGORIES.forEach(cat => {
         document.getElementById(`stars-${cid}-${cat.id}`).querySelectorAll('.pill').forEach(s => s.classList.remove('selected'));
         document.getElementById(`comment-${cid}-${cat.id}`).value = '';
     });
     document.getElementById(`overall-${cid}`).value = '';
-    autoSave();
+    collectAndSave();
     showToast('Cleared');
 }
 
 function loadObserverData() {
-    const data = getData();
-    const obs = data.observers[observerName];
+    const key = encodeObserverKey(observerName);
+    const obs = cachedData.observers?.[key];
     if (!obs) return;
 
     CANDIDATES.forEach(cid => {
-        const c = obs.candidates[cid];
+        const c = obs.candidates?.[cid];
         if (!c) return;
         const nameEl = document.getElementById(`name-${cid}`);
         if (nameEl && c.name) nameEl.value = c.name;
 
         CATEGORIES.forEach(cat => {
-            if (c.ratings[cat.id]) setRating(cid, cat.id, c.ratings[cat.id]);
+            if (c.ratings?.[cat.id]) setRating(cid, cat.id, c.ratings[cat.id]);
             const commentEl = document.getElementById(`comment-${cid}-${cat.id}`);
-            if (commentEl && c.comments[cat.id]) commentEl.value = c.comments[cat.id];
+            if (commentEl && c.comments?.[cat.id]) commentEl.value = c.comments[cat.id];
         });
 
         const overallEl = document.getElementById(`overall-${cid}`);
@@ -1048,8 +1059,8 @@ function loadObserverData() {
 }
 
 function updateTabIndicators() {
-    const data = getData();
-    const obs = data.observers[observerName];
+    const key = encodeObserverKey(observerName);
+    const obs = cachedData.observers?.[key];
     const buttons = document.querySelectorAll('#nav button');
 
     CANDIDATES.forEach((cid, ci) => {
@@ -1060,10 +1071,10 @@ function updateTabIndicators() {
             buttons[ci].appendChild(badge);
         }
 
-        if (!obs || !obs.candidates[cid]) { badge.className = 'badge'; return; }
+        if (!obs || !obs.candidates?.[cid]) { badge.className = 'badge'; return; }
 
         const c = obs.candidates[cid];
-        const totalRatings = CATEGORIES.reduce((sum, cat) => sum + (c.ratings[cat.id] > 0 ? 1 : 0), 0);
+        const totalRatings = CATEGORIES.reduce((sum, cat) => sum + ((c.ratings?.[cat.id] || 0) > 0 ? 1 : 0), 0);
 
         if (totalRatings === CATEGORIES.length) badge.className = 'badge complete';
         else if (totalRatings > 0) badge.className = 'badge partial';
@@ -1082,19 +1093,20 @@ function showSection(sectionId) {
         document.querySelectorAll('#nav button')[idx].classList.add('active');
     } else if (sectionId === 'summary') {
         document.getElementById('section-summary').classList.add('active');
-        // summary button is at index 5 (after divider)
         const btns = document.querySelectorAll('#nav button');
         btns[btns.length - 1].classList.add('active');
         buildSummary();
     }
 }
 
+// ─── Summary ───
 function buildSummary() {
-    const data = getData();
+    const data = cachedData;
     const container = document.getElementById('section-summary');
-    const observers = Object.keys(data.observers);
+    if (!container) return;
+    const observerKeys = Object.keys(data.observers || {});
 
-    if (observers.length === 0) {
+    if (observerKeys.length === 0) {
         container.innerHTML = `<div class="empty-state">
             <div class="empty-icon"><span class="material-symbols-outlined">assessment</span></div>
             <h3>No evaluations yet</h3>
@@ -1110,15 +1122,15 @@ function buildSummary() {
         candidateScores[cid] = {};
         CATEGORIES.forEach(cat => {
             const ratings = [];
-            observers.forEach(obs => {
-                const c = data.observers[obs].candidates?.[cid];
-                if (c && c.ratings[cat.id] > 0) ratings.push(c.ratings[cat.id]);
+            observerKeys.forEach(key => {
+                const c = data.observers[key].candidates?.[cid];
+                if (c && c.ratings?.[cat.id] > 0) ratings.push(c.ratings[cat.id]);
             });
             candidateScores[cid][cat.id] = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
         });
 
-        observers.forEach(obs => {
-            const c = data.observers[obs].candidates?.[cid];
+        observerKeys.forEach(key => {
+            const c = data.observers[key].candidates?.[cid];
             if (c && c.name) candidateNames[cid] = c.name;
         });
     });
@@ -1143,16 +1155,22 @@ function buildSummary() {
         return 'var(--score-1)';
     }
 
-    let html = '<div class="summary-hero">';
+    function getObsDisplayName(key) {
+        return data.observers[key].displayName || key;
+    }
+
+    let html = '<div style="display:flex;align-items:center;gap:8px;margin-bottom:20px"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--success);animation:pulse 2s infinite"></span><span style="font-size:0.78rem;font-weight:600;color:var(--success)">Live — updates in real time across all observers</span></div>';
+
+    html += '<div class="summary-hero">';
 
     // Ranking
     html += '<div class="summary-card"><h3>Candidate Ranking</h3>';
     html += '<table class="ranking-table"><thead><tr><th>Rank</th><th>Candidate</th><th>Avg Score</th><th>Evaluations</th></tr></thead><tbody>';
     ranked.forEach((cid, i) => {
         if (overallAvg[cid] === 0) return;
-        const evalCount = observers.filter(obs => {
-            const c = data.observers[obs].candidates?.[cid];
-            return c && Object.values(c.ratings).some(r => r > 0);
+        const evalCount = observerKeys.filter(key => {
+            const c = data.observers[key].candidates?.[cid];
+            return c && Object.values(c.ratings || {}).some(r => r > 0);
         }).length;
         html += `<tr>
             <td><span class="rank-badge rank-${i + 1}">${i + 1}</span></td>
@@ -1165,10 +1183,11 @@ function buildSummary() {
 
     // Observers
     html += '<div class="summary-card"><h3>Observers</h3>';
-    observers.forEach(obs => {
-        const ts = new Date(data.observers[obs].timestamp);
+    observerKeys.forEach(key => {
+        const obs = data.observers[key];
+        const ts = new Date(obs.timestamp);
         html += `<div class="observer-row">
-            <span class="obs-name">${obs}</span>
+            <span class="obs-name">${getObsDisplayName(key)}</span>
             <span class="obs-time">${ts.toLocaleDateString()} ${ts.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})}</span>
         </div>`;
     });
@@ -1207,15 +1226,16 @@ function buildSummary() {
         html += '<div class="comments-section"><h4>Comments from Observers</h4>';
         let hasComments = false;
 
-        observers.forEach(obs => {
-            const c = data.observers[obs].candidates?.[cid];
+        observerKeys.forEach(key => {
+            const c = data.observers[key].candidates?.[cid];
             if (!c) return;
+            const dn = getObsDisplayName(key);
 
             CATEGORIES.forEach(cat => {
-                if (c.comments[cat.id] && c.comments[cat.id].trim()) {
+                if (c.comments?.[cat.id] && c.comments[cat.id].trim()) {
                     hasComments = true;
                     html += `<div class="comment-bubble">
-                        <div class="cb-meta">${obs} — ${cat.name}</div>
+                        <div class="cb-meta">${dn} — ${cat.name}</div>
                         <div class="cb-text">${escapeHtml(c.comments[cat.id])}</div>
                     </div>`;
                 }
@@ -1224,7 +1244,7 @@ function buildSummary() {
             if (c.overall && c.overall.trim()) {
                 hasComments = true;
                 html += `<div class="comment-bubble highlight">
-                    <div class="cb-meta">${obs} — Overall Assessment</div>
+                    <div class="cb-meta">${dn} — Overall Assessment</div>
                     <div class="cb-text">${escapeHtml(c.overall)}</div>
                 </div>`;
             }
@@ -1325,15 +1345,8 @@ function buildBarChart(scores, names, overallAvg) {
             responsive: true,
             maintainAspectRatio: true,
             scales: {
-                y: {
-                    min: 0, max: 5,
-                    ticks: { stepSize: 1, font: { size: 11, family: 'Plus Jakarta Sans' } },
-                    grid: { color: '#f0f2f5' }
-                },
-                x: {
-                    ticks: { font: { size: 10, family: 'Plus Jakarta Sans', weight: '500' } },
-                    grid: { display: false }
-                }
+                y: { min: 0, max: 5, ticks: { stepSize: 1, font: { size: 11, family: 'Plus Jakarta Sans' } }, grid: { color: '#f0f2f5' } },
+                x: { ticks: { font: { size: 10, family: 'Plus Jakarta Sans', weight: '500' } }, grid: { display: false } }
             },
             plugins: {
                 legend: { position: 'bottom', labels: { font: { size: 12, family: 'Plus Jakarta Sans', weight: '600' }, padding: 24, usePointStyle: true, pointStyle: 'rectRounded' } }
@@ -1349,16 +1362,16 @@ function escapeHtml(str) {
 }
 
 function clearAllData() {
-    if (!confirm('This will permanently delete ALL evaluation data. Are you sure?')) return;
+    if (!confirm('This will permanently delete ALL evaluation data from ALL observers. Are you sure?')) return;
     if (!confirm('Really delete everything? This cannot be undone.')) return;
-    localStorage.removeItem('mbmth_eval_data_v2');
+    dbRef.remove();
+    cachedData = { observers: {} };
     showToast('All data cleared');
     buildSummary();
 }
 
 function exportData() {
-    const data = getData();
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const blob = new Blob([JSON.stringify(cachedData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -1368,6 +1381,13 @@ function exportData() {
     showToast('Data exported');
 }
 </script>
+
+<style>
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+</style>
 
 </body>
 </html>
