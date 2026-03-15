@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Evaluation – Strategic Assistant MBMTH</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <style>
+        :root {
+            --mb-black: #000000;
+            --mb-dark: #1a1a2e;
+            --mb-silver: #c0c0c0;
+            --mb-light: #f4f4f8;
+            --mb-white: #ffffff;
+            --mb-accent: #0f3460;
+            --mb-blue: #1a73e8;
+            --mb-green: #1e8e3e;
+            --mb-orange: #f9a825;
+            --mb-red: #d93025;
+            --star-1: #d93025;
+            --star-2: #e8710a;
+            --star-3: #f9a825;
+            --star-4: #1e8e3e;
+            --star-5: #0d652d;
+            --shadow: 0 2px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --radius: 12px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background: var(--mb-light);
+            color: var(--mb-dark);
+            line-height: 1.6;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--mb-dark) 0%, var(--mb-accent) 100%);
+            color: var(--mb-white);
+            padding: 24px 40px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .header-left { display: flex; align-items: center; gap: 16px; }
+
+        .header h1 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+        }
+
+        .header .subtitle {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            font-weight: 300;
+        }
+
+        .logo {
+            width: 40px; height: 40px;
+            background: var(--mb-white);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 14px; color: var(--mb-dark);
+        }
+
+        /* Navigation */
+        .nav {
+            display: flex;
+            background: var(--mb-white);
+            border-bottom: 1px solid #e0e0e0;
+            padding: 0 40px;
+            gap: 0;
+            overflow-x: auto;
+        }
+
+        .nav button {
+            padding: 14px 24px;
+            border: none;
+            background: none;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+
+        .nav button:hover { color: var(--mb-accent); }
+        .nav button.active {
+            color: var(--mb-accent);
+            border-bottom-color: var(--mb-accent);
+        }
+
+        /* Main content */
+        .main { max-width: 1200px; margin: 0 auto; padding: 32px 24px; }
+
+        /* Observer entry */
+        .observer-bar {
+            background: var(--mb-white);
+            border-radius: var(--radius);
+            padding: 20px 28px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .observer-bar label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .observer-bar input {
+            flex: 1;
+            padding: 10px 16px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            transition: border-color 0.2s;
+        }
+
+        .observer-bar input:focus {
+            outline: none;
+            border-color: var(--mb-accent);
+        }
+
+        /* Sections */
+        .section { display: none; }
+        .section.active { display: block; }
+
+        /* Card */
+        .card {
+            background: var(--mb-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 28px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .card-body { padding: 24px 28px; }
+
+        /* Candidate header */
+        .candidate-name-input {
+            padding: 10px 16px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            font-weight: 600;
+            width: 300px;
+            transition: border-color 0.2s;
+        }
+
+        .candidate-name-input:focus {
+            outline: none;
+            border-color: var(--mb-accent);
+        }
+
+        /* Rating category row */
+        .category-row {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 20px;
+            align-items: start;
+            padding: 16px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .category-row:last-child { border-bottom: none; }
+
+        .category-info h3 {
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .category-info p {
+            font-size: 0.75rem;
+            color: #888;
+            line-height: 1.4;
+        }
+
+        /* Star rating */
+        .star-rating {
+            display: flex;
+            gap: 4px;
+            padding-top: 2px;
+        }
+
+        .star-rating .star {
+            width: 36px; height: 36px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #bbb;
+            background: var(--mb-white);
+        }
+
+        .star-rating .star:hover { border-color: var(--mb-accent); color: var(--mb-accent); transform: scale(1.1); }
+        .star-rating .star.selected {
+            color: var(--mb-white);
+            border-color: transparent;
+        }
+        .star-rating .star.selected[data-value="1"] { background: var(--star-1); }
+        .star-rating .star.selected[data-value="2"] { background: var(--star-2); }
+        .star-rating .star.selected[data-value="3"] { background: var(--star-3); }
+        .star-rating .star.selected[data-value="4"] { background: var(--star-4); }
+        .star-rating .star.selected[data-value="5"] { background: var(--star-5); }
+
+        .comment-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.8rem;
+            resize: vertical;
+            min-height: 38px;
+            transition: border-color 0.2s;
+        }
+
+        .comment-input:focus { outline: none; border-color: var(--mb-accent); }
+
+        /* Buttons */
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--mb-accent);
+            color: var(--mb-white);
+        }
+
+        .btn-primary:hover { background: #0a2540; }
+
+        .btn-secondary {
+            background: #e8edf2;
+            color: var(--mb-accent);
+        }
+
+        .btn-secondary:hover { background: #d0d8e2; }
+
+        .btn-danger {
+            background: #fde8e8;
+            color: var(--mb-red);
+        }
+
+        .btn-danger:hover { background: #fcd0d0; }
+
+        .actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        /* Summary section */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 24px;
+        }
+
+        .summary-card {
+            background: var(--mb-white);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 24px;
+        }
+
+        .summary-card h3 {
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: var(--mb-dark);
+        }
+
+        .score-big {
+            font-size: 2.5rem;
+            font-weight: 700;
+            line-height: 1;
+        }
+
+        .score-label {
+            font-size: 0.75rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        .score-bar-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .score-bar-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            width: 160px;
+            flex-shrink: 0;
+        }
+
+        .score-bar-track {
+            flex: 1;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        .score-bar-value {
+            font-size: 0.75rem;
+            font-weight: 700;
+            width: 30px;
+            text-align: right;
+        }
+
+        /* Ranking table */
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .ranking-table th {
+            text-align: left;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            padding: 8px 12px;
+            border-bottom: 2px solid #eee;
+        }
+
+        .ranking-table td {
+            padding: 12px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 0.85rem;
+        }
+
+        .ranking-table tr:last-child td { border-bottom: none; }
+
+        .rank-badge {
+            width: 28px; height: 28px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8rem;
+            color: var(--mb-white);
+        }
+
+        .rank-1 { background: #FFD700; color: #333; }
+        .rank-2 { background: var(--mb-silver); color: #333; }
+        .rank-3 { background: #CD7F32; }
+        .rank-4 { background: #999; }
+
+        /* Chart container */
+        .chart-container {
+            position: relative;
+            width: 100%;
+            max-height: 350px;
+        }
+
+        /* Observer history */
+        .observer-entry {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .observer-entry:last-child { border-bottom: none; }
+
+        .observer-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .observer-date {
+            font-size: 0.75rem;
+            color: #888;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--mb-dark);
+            color: var(--mb-white);
+            padding: 14px 24px;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            box-shadow: var(--shadow-lg);
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header { padding: 16px 20px; }
+            .nav { padding: 0 12px; }
+            .nav button { padding: 12px 14px; font-size: 0.8rem; }
+            .main { padding: 16px 12px; }
+            .observer-bar { flex-direction: column; align-items: stretch; }
+            .category-row { grid-template-columns: 1fr; }
+            .summary-grid { grid-template-columns: 1fr; }
+            .candidate-name-input { width: 100%; }
+        }
+
+        /* Print */
+        @media print {
+            .header, .nav, .observer-bar, .actions, .btn { display: none !important; }
+            .section { display: block !important; }
+            .card { box-shadow: none; border: 1px solid #ddd; }
+        }
+
+        .overall-comment {
+            margin-top: 16px;
+        }
+
+        .overall-comment label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+        }
+
+        .overall-comment textarea {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1.5px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.85rem;
+            resize: vertical;
+            min-height: 60px;
+            transition: border-color 0.2s;
+        }
+
+        .overall-comment textarea:focus {
+            outline: none;
+            border-color: var(--mb-accent);
+        }
+
+        /* Comments summary */
+        .comments-list {
+            margin-top: 12px;
+        }
+
+        .comment-item {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 8px;
+        }
+
+        .comment-item .comment-observer {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--mb-accent);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
+        .comment-item .comment-text {
+            font-size: 0.8rem;
+            color: #444;
+            margin-top: 4px;
+        }
+
+        .tab-indicator {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-left: 6px;
+        }
+
+        .tab-indicator.complete { background: var(--mb-green); }
+        .tab-indicator.partial { background: var(--mb-orange); }
+
+        .no-data {
+            text-align: center;
+            padding: 60px 20px;
+            color: #aaa;
+        }
+
+        .no-data h3 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+            color: #888;
+        }
+
+        .no-data p { font-size: 0.85rem; }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <div class="header-left">
+        <div class="logo">MB</div>
+        <div>
+            <h1>Interview Evaluation Panel</h1>
+            <div class="subtitle">Strategic Assistant – Operational & Financial Excellence, MBMTH</div>
+        </div>
+    </div>
+</div>
+
+<div class="nav" id="nav">
+    <button class="active" onclick="showSection('candidate1')">Candidate 1</button>
+    <button onclick="showSection('candidate2')">Candidate 2</button>
+    <button onclick="showSection('candidate3')">Candidate 3</button>
+    <button onclick="showSection('candidate4')">Candidate 4</button>
+    <button onclick="showSection('summary')">Summary</button>
+</div>
+
+<div class="main">
+    <div class="observer-bar">
+        <label for="observerName">Observer Name:</label>
+        <input type="text" id="observerName" placeholder="Enter your name to begin evaluation..." />
+        <button class="btn btn-primary" onclick="setObserver()">Start</button>
+    </div>
+
+    <div id="evaluationArea" style="display:none;">
+        <!-- Candidate sections generated by JS -->
+    </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const CATEGORIES = [
+    {
+        id: 'strategic',
+        name: 'Strategic Thinking & Transformation',
+        desc: 'Ability to develop and execute strategic initiatives, build business cases, and drive transformation roadmaps.'
+    },
+    {
+        id: 'analytical',
+        name: 'Analytical & Problem-Solving Skills',
+        desc: 'Structured thinking, data-driven analysis, ability to synthesize complex information into actionable insights.'
+    },
+    {
+        id: 'operational',
+        name: 'Operational & Financial Excellence',
+        desc: 'Understanding of KPIs, cost structures, production efficiency, budgets, and performance management.'
+    },
+    {
+        id: 'communication',
+        name: 'Communication & Presentation',
+        desc: 'Executive-level presentation skills, clarity in English and Thai, ability to prepare decision papers.'
+    },
+    {
+        id: 'project',
+        name: 'Project Management & Execution',
+        desc: 'Cross-functional coordination, structured tracking, delivery under pressure, ownership mindset.'
+    },
+    {
+        id: 'leadership',
+        name: 'Leadership Potential & Cultural Fit',
+        desc: 'Professional integrity, discretion, maturity, team collaboration, alignment with company values.'
+    },
+    {
+        id: 'sustainability',
+        name: 'Sustainability & ESG Awareness',
+        desc: 'Knowledge of ESG frameworks, energy efficiency, CO2 reduction, environmental compliance.'
+    }
+];
+
+const CANDIDATES = ['candidate1', 'candidate2', 'candidate3', 'candidate4'];
+const CANDIDATE_LABELS = ['Candidate 1', 'Candidate 2', 'Candidate 3', 'Candidate 4'];
+const COLORS = ['#1a73e8', '#e8710a', '#1e8e3e', '#9334e6'];
+
+let currentSection = 'candidate1';
+let observerName = '';
+
+// Initialize data from localStorage
+function getData() {
+    const d = localStorage.getItem('mbmth_eval_data');
+    return d ? JSON.parse(d) : { observers: {} };
+}
+
+function saveData(data) {
+    localStorage.setItem('mbmth_eval_data', JSON.stringify(data));
+}
+
+function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function setObserver() {
+    const input = document.getElementById('observerName');
+    const name = input.value.trim();
+    if (!name) { showToast('Please enter your name'); return; }
+    observerName = name;
+    document.getElementById('evaluationArea').style.display = 'block';
+    input.disabled = true;
+    buildSections();
+    loadObserverData();
+    showSection('candidate1');
+    showToast('Welcome, ' + name);
+}
+
+function buildSections() {
+    const area = document.getElementById('evaluationArea');
+    let html = '';
+
+    CANDIDATES.forEach((cid, ci) => {
+        html += `<div class="section${ci === 0 ? ' active' : ''}" id="section-${cid}">`;
+        html += `<div class="card"><div class="card-header"><h2>${CANDIDATE_LABELS[ci]}</h2></div>`;
+        html += `<div class="card-body">`;
+        html += `<div style="margin-bottom:20px"><label style="font-size:0.8rem;font-weight:600;color:#555;display:block;margin-bottom:6px">Candidate Name</label>`;
+        html += `<input class="candidate-name-input" id="name-${cid}" placeholder="Enter candidate name..." onchange="autoSave()"/></div>`;
+
+        CATEGORIES.forEach(cat => {
+            html += `<div class="category-row">`;
+            html += `<div class="category-info"><h3>${cat.name}</h3><p>${cat.desc}</p></div>`;
+            html += `<div class="star-rating" id="stars-${cid}-${cat.id}">`;
+            for (let i = 1; i <= 5; i++) {
+                html += `<div class="star" data-value="${i}" onclick="setRating('${cid}','${cat.id}',${i})">${i}</div>`;
+            }
+            html += `</div>`;
+            html += `<textarea class="comment-input" id="comment-${cid}-${cat.id}" placeholder="Comments..." onchange="autoSave()"></textarea>`;
+            html += `</div>`;
+        });
+
+        html += `<div class="overall-comment">`;
+        html += `<label>Overall Comment / Recommendation</label>`;
+        html += `<textarea id="overall-${cid}" placeholder="Overall impression, recommendation, red/green flags..." onchange="autoSave()"></textarea>`;
+        html += `</div>`;
+
+        html += `</div></div>`;
+        html += `<div class="actions">`;
+        html += `<button class="btn btn-secondary" onclick="clearCandidate('${cid}')">Clear</button>`;
+        html += `<button class="btn btn-primary" onclick="saveCandidate('${cid}')">Save Evaluation</button>`;
+        html += `</div></div>`;
+    });
+
+    // Summary section
+    html += `<div class="section" id="section-summary"></div>`;
+
+    area.innerHTML = html;
+}
+
+function setRating(cid, catId, value) {
+    const container = document.getElementById(`stars-${cid}-${catId}`);
+    container.querySelectorAll('.star').forEach(s => {
+        const v = parseInt(s.dataset.value);
+        if (v <= value) s.classList.add('selected');
+        else s.classList.remove('selected');
+    });
+    autoSave();
+}
+
+function getRating(cid, catId) {
+    const container = document.getElementById(`stars-${cid}-${catId}`);
+    const selected = container.querySelectorAll('.star.selected');
+    return selected.length > 0 ? parseInt([...selected].pop().dataset.value) : 0;
+}
+
+function autoSave() {
+    // Lightweight save on every change
+    const data = getData();
+    if (!observerName) return;
+    if (!data.observers[observerName]) data.observers[observerName] = { timestamp: new Date().toISOString(), candidates: {} };
+
+    CANDIDATES.forEach(cid => {
+        const cData = { name: '', ratings: {}, comments: {}, overall: '' };
+        const nameEl = document.getElementById(`name-${cid}`);
+        if (nameEl) cData.name = nameEl.value;
+
+        CATEGORIES.forEach(cat => {
+            cData.ratings[cat.id] = getRating(cid, cat.id);
+            const commentEl = document.getElementById(`comment-${cid}-${cat.id}`);
+            if (commentEl) cData.comments[cat.id] = commentEl.value;
+        });
+
+        const overallEl = document.getElementById(`overall-${cid}`);
+        if (overallEl) cData.overall = overallEl.value;
+
+        data.observers[observerName].candidates[cid] = cData;
+    });
+
+    data.observers[observerName].timestamp = new Date().toISOString();
+    saveData(data);
+    updateTabIndicators();
+}
+
+function saveCandidate(cid) {
+    autoSave();
+    showToast('Evaluation saved successfully');
+}
+
+function clearCandidate(cid) {
+    if (!confirm('Clear all ratings and comments for this candidate?')) return;
+    document.getElementById(`name-${cid}`).value = '';
+    CATEGORIES.forEach(cat => {
+        document.getElementById(`stars-${cid}-${cat.id}`).querySelectorAll('.star').forEach(s => s.classList.remove('selected'));
+        document.getElementById(`comment-${cid}-${cat.id}`).value = '';
+    });
+    document.getElementById(`overall-${cid}`).value = '';
+    autoSave();
+    showToast('Cleared');
+}
+
+function loadObserverData() {
+    const data = getData();
+    const obs = data.observers[observerName];
+    if (!obs) return;
+
+    CANDIDATES.forEach(cid => {
+        const c = obs.candidates[cid];
+        if (!c) return;
+        const nameEl = document.getElementById(`name-${cid}`);
+        if (nameEl && c.name) nameEl.value = c.name;
+
+        CATEGORIES.forEach(cat => {
+            if (c.ratings[cat.id]) setRating(cid, cat.id, c.ratings[cat.id]);
+            const commentEl = document.getElementById(`comment-${cid}-${cat.id}`);
+            if (commentEl && c.comments[cat.id]) commentEl.value = c.comments[cat.id];
+        });
+
+        const overallEl = document.getElementById(`overall-${cid}`);
+        if (overallEl && c.overall) overallEl.value = c.overall;
+    });
+
+    updateTabIndicators();
+}
+
+function updateTabIndicators() {
+    const data = getData();
+    const obs = data.observers[observerName];
+    const buttons = document.querySelectorAll('#nav button');
+
+    CANDIDATES.forEach((cid, ci) => {
+        let indicator = buttons[ci].querySelector('.tab-indicator');
+        if (!indicator) {
+            indicator = document.createElement('span');
+            indicator.className = 'tab-indicator';
+            buttons[ci].appendChild(indicator);
+        }
+
+        if (!obs || !obs.candidates[cid]) {
+            indicator.className = 'tab-indicator';
+            return;
+        }
+
+        const c = obs.candidates[cid];
+        const totalRatings = CATEGORIES.reduce((sum, cat) => sum + (c.ratings[cat.id] > 0 ? 1 : 0), 0);
+
+        if (totalRatings === CATEGORIES.length) indicator.className = 'tab-indicator complete';
+        else if (totalRatings > 0) indicator.className = 'tab-indicator partial';
+        else indicator.className = 'tab-indicator';
+    });
+}
+
+function showSection(sectionId) {
+    currentSection = sectionId;
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('#nav button').forEach(b => b.classList.remove('active'));
+
+    const idx = CANDIDATES.indexOf(sectionId);
+    if (idx >= 0) {
+        document.getElementById(`section-${sectionId}`).classList.add('active');
+        document.querySelectorAll('#nav button')[idx].classList.add('active');
+    } else if (sectionId === 'summary') {
+        document.getElementById('section-summary').classList.add('active');
+        document.querySelectorAll('#nav button')[4].classList.add('active');
+        buildSummary();
+    }
+}
+
+function buildSummary() {
+    const data = getData();
+    const container = document.getElementById('section-summary');
+    const observers = Object.keys(data.observers);
+
+    if (observers.length === 0) {
+        container.innerHTML = '<div class="no-data"><h3>No evaluations yet</h3><p>Complete at least one candidate evaluation to see the summary.</p></div>';
+        return;
+    }
+
+    // Compute aggregated scores
+    const candidateScores = {};
+    const candidateNames = {};
+
+    CANDIDATES.forEach(cid => {
+        candidateScores[cid] = {};
+        CATEGORIES.forEach(cat => {
+            const ratings = [];
+            observers.forEach(obs => {
+                const c = data.observers[obs].candidates?.[cid];
+                if (c && c.ratings[cat.id] > 0) ratings.push(c.ratings[cat.id]);
+            });
+            candidateScores[cid][cat.id] = ratings.length > 0 ? (ratings.reduce((a, b) => a + b, 0) / ratings.length) : 0;
+        });
+
+        // Get name from latest observer data
+        observers.forEach(obs => {
+            const c = data.observers[obs].candidates?.[cid];
+            if (c && c.name) candidateNames[cid] = c.name;
+        });
+    });
+
+    // Overall averages
+    const overallAvg = {};
+    CANDIDATES.forEach(cid => {
+        const scores = Object.values(candidateScores[cid]).filter(v => v > 0);
+        overallAvg[cid] = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+    });
+
+    // Ranking
+    const ranked = [...CANDIDATES].sort((a, b) => overallAvg[b] - overallAvg[a]);
+
+    function getCandidateLabel(cid) {
+        const idx = CANDIDATES.indexOf(cid);
+        return candidateNames[cid] || CANDIDATE_LABELS[idx];
+    }
+
+    function getScoreColor(score) {
+        if (score >= 4.5) return 'var(--star-5)';
+        if (score >= 3.5) return 'var(--star-4)';
+        if (score >= 2.5) return 'var(--star-3)';
+        if (score >= 1.5) return 'var(--star-2)';
+        return 'var(--star-1)';
+    }
+
+    let html = '';
+
+    // Top cards - ranking overview
+    html += '<div class="summary-grid">';
+
+    // Ranking card
+    html += '<div class="summary-card"><h3>Candidate Ranking</h3>';
+    html += '<table class="ranking-table"><thead><tr><th>Rank</th><th>Candidate</th><th>Avg Score</th><th>Evaluations</th></tr></thead><tbody>';
+    ranked.forEach((cid, i) => {
+        if (overallAvg[cid] === 0) return;
+        const evalCount = observers.filter(obs => {
+            const c = data.observers[obs].candidates?.[cid];
+            return c && Object.values(c.ratings).some(r => r > 0);
+        }).length;
+        html += `<tr>
+            <td><span class="rank-badge rank-${i + 1}">${i + 1}</span></td>
+            <td style="font-weight:600">${getCandidateLabel(cid)}</td>
+            <td><span style="font-weight:700;color:${getScoreColor(overallAvg[cid])}">${overallAvg[cid].toFixed(2)}</span> / 5</td>
+            <td>${evalCount} observer${evalCount !== 1 ? 's' : ''}</td>
+        </tr>`;
+    });
+    html += '</tbody></table></div>';
+
+    // Observers card
+    html += '<div class="summary-card"><h3>Observers</h3>';
+    observers.forEach(obs => {
+        const ts = new Date(data.observers[obs].timestamp);
+        html += `<div class="observer-entry">
+            <span class="observer-name">${obs}</span>
+            <span class="observer-date">${ts.toLocaleDateString()} ${ts.toLocaleTimeString()}</span>
+        </div>`;
+    });
+    html += `<div class="actions" style="margin-top:16px">
+        <button class="btn btn-danger" onclick="clearAllData()">Clear All Data</button>
+        <button class="btn btn-secondary" onclick="exportData()">Export JSON</button>
+    </div>`;
+    html += '</div>';
+    html += '</div>';
+
+    // Radar chart
+    html += '<div class="card"><div class="card-header"><h2>Competency Comparison – Radar Chart</h2></div>';
+    html += '<div class="card-body"><div class="chart-container"><canvas id="radarChart"></canvas></div></div></div>';
+
+    // Bar chart per category
+    html += '<div class="card"><div class="card-header"><h2>Score Breakdown by Category</h2></div>';
+    html += '<div class="card-body"><div class="chart-container"><canvas id="barChart"></canvas></div></div></div>';
+
+    // Detailed scores per candidate
+    CANDIDATES.forEach((cid, ci) => {
+        if (overallAvg[cid] === 0) return;
+
+        html += `<div class="card"><div class="card-header"><h2 style="color:${COLORS[ci]}">${getCandidateLabel(cid)}</h2>`;
+        html += `<span style="font-size:1.5rem;font-weight:700;color:${getScoreColor(overallAvg[cid])}">${overallAvg[cid].toFixed(2)}</span></div>`;
+        html += '<div class="card-body">';
+
+        CATEGORIES.forEach(cat => {
+            const score = candidateScores[cid][cat.id];
+            const pct = (score / 5 * 100).toFixed(0);
+            html += `<div class="score-bar-container">
+                <span class="score-bar-label">${cat.name}</span>
+                <div class="score-bar-track"><div class="score-bar-fill" style="width:${pct}%;background:${getScoreColor(score)}"></div></div>
+                <span class="score-bar-value" style="color:${getScoreColor(score)}">${score > 0 ? score.toFixed(1) : '-'}</span>
+            </div>`;
+        });
+
+        // Show comments from all observers
+        html += '<div class="comments-list" style="margin-top:20px"><h3 style="font-size:0.85rem;margin-bottom:12px">Comments from Observers</h3>';
+        let hasComments = false;
+
+        observers.forEach(obs => {
+            const c = data.observers[obs].candidates?.[cid];
+            if (!c) return;
+
+            CATEGORIES.forEach(cat => {
+                if (c.comments[cat.id] && c.comments[cat.id].trim()) {
+                    hasComments = true;
+                    html += `<div class="comment-item">
+                        <div class="comment-observer">${obs} – ${cat.name}</div>
+                        <div class="comment-text">${escapeHtml(c.comments[cat.id])}</div>
+                    </div>`;
+                }
+            });
+
+            if (c.overall && c.overall.trim()) {
+                hasComments = true;
+                html += `<div class="comment-item" style="border-left:3px solid ${COLORS[ci]};padding-left:14px">
+                    <div class="comment-observer">${obs} – Overall</div>
+                    <div class="comment-text">${escapeHtml(c.overall)}</div>
+                </div>`;
+            }
+        });
+
+        if (!hasComments) html += '<p style="color:#aaa;font-size:0.8rem">No comments yet.</p>';
+
+        html += '</div></div></div>';
+    });
+
+    container.innerHTML = html;
+
+    // Build charts
+    setTimeout(() => {
+        buildRadarChart(candidateScores, candidateNames, overallAvg);
+        buildBarChart(candidateScores, candidateNames, overallAvg);
+    }, 50);
+}
+
+function buildRadarChart(scores, names, overallAvg) {
+    const ctx = document.getElementById('radarChart');
+    if (!ctx) return;
+
+    const datasets = [];
+    CANDIDATES.forEach((cid, ci) => {
+        if (overallAvg[cid] === 0) return;
+        const label = names[cid] || CANDIDATE_LABELS[ci];
+        datasets.push({
+            label: label,
+            data: CATEGORIES.map(cat => scores[cid][cat.id]),
+            borderColor: COLORS[ci],
+            backgroundColor: COLORS[ci] + '20',
+            borderWidth: 2,
+            pointRadius: 4,
+            pointBackgroundColor: COLORS[ci]
+        });
+    });
+
+    new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: CATEGORIES.map(c => c.name.length > 20 ? c.name.substring(0, 20) + '...' : c.name),
+            datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                r: {
+                    min: 0, max: 5,
+                    ticks: { stepSize: 1, font: { size: 10 } },
+                    pointLabels: { font: { size: 11 } }
+                }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 20 } }
+            }
+        }
+    });
+}
+
+function buildBarChart(scores, names, overallAvg) {
+    const ctx = document.getElementById('barChart');
+    if (!ctx) return;
+
+    const datasets = [];
+    CANDIDATES.forEach((cid, ci) => {
+        if (overallAvg[cid] === 0) return;
+        const label = names[cid] || CANDIDATE_LABELS[ci];
+        datasets.push({
+            label: label,
+            data: CATEGORIES.map(cat => scores[cid][cat.id]),
+            backgroundColor: COLORS[ci] + 'CC',
+            borderColor: COLORS[ci],
+            borderWidth: 1,
+            borderRadius: 4
+        });
+    });
+
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: CATEGORIES.map(c => c.name.length > 25 ? c.name.substring(0, 25) + '...' : c.name),
+            datasets
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: true,
+            scales: {
+                y: { min: 0, max: 5, ticks: { stepSize: 1 } },
+                x: { ticks: { font: { size: 10 } } }
+            },
+            plugins: {
+                legend: { position: 'bottom', labels: { font: { size: 12 }, padding: 20 } }
+            }
+        }
+    });
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+function clearAllData() {
+    if (!confirm('This will permanently delete ALL evaluation data from ALL observers. Are you sure?')) return;
+    if (!confirm('Really delete everything? This cannot be undone.')) return;
+    localStorage.removeItem('mbmth_eval_data');
+    showToast('All data cleared');
+    buildSummary();
+}
+
+function exportData() {
+    const data = getData();
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interview_evaluation_${new Date().toISOString().split('T')[0]}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+    showToast('Data exported');
+}
+</script>
+
+</body>
+</html>
