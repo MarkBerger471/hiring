@@ -767,10 +767,10 @@
 
 <div class="nav-wrapper">
     <div class="nav" id="nav">
-        <button class="active" onclick="showSection('candidate1')">Candidate 1</button>
-        <button onclick="showSection('candidate2')">Candidate 2</button>
-        <button onclick="showSection('candidate3')">Candidate 3</button>
-        <button onclick="showSection('candidate4')">Candidate 4</button>
+        <button class="active" onclick="showSection('candidate1')">Krichasorn J.</button>
+        <button onclick="showSection('candidate2')">Panjapat L.</button>
+        <button onclick="showSection('candidate3')">Chariya C.</button>
+        <button onclick="showSection('candidate4')">Natchayada K.</button>
         <div class="nav-divider"></div>
         <button onclick="showSection('summary')">Summary</button>
     </div>
@@ -859,7 +859,7 @@ const GROUPS = {
 };
 
 const CANDIDATES = ['candidate1', 'candidate2', 'candidate3', 'candidate4'];
-const CANDIDATE_LABELS = ['Candidate 1', 'Candidate 2', 'Candidate 3', 'Candidate 4'];
+const CANDIDATE_LABELS = ['Krichasorn Jamnong', 'Panjapat Lerdwisarnphob', 'Chariya Chaihao', 'Natchayada Katekaew'];
 const COLORS = ['#1570ef', '#ef6820', '#17b26a', '#7a5af8'];
 
 let currentSection = 'candidate1';
@@ -906,10 +906,7 @@ function buildSections() {
         html += `<div class="card"><div class="card-header"><h2>${CANDIDATE_LABELS[ci]}</h2></div>`;
         html += `<div class="card-body">`;
 
-        html += `<div class="candidate-name-group">`;
-        html += `<label>Candidate Name</label>`;
-        html += `<input class="candidate-name-input" id="name-${cid}" placeholder="Enter candidate name..." oninput="autoSave()"/>`;
-        html += `</div>`;
+        html += `<input type="hidden" id="name-${cid}" value="${CANDIDATE_LABELS[ci]}"/>`;
 
         let currentGroup = '';
         CATEGORIES.forEach(cat => {
