@@ -508,21 +508,25 @@ function buildSummary() {
     }, 50);
 }
 
+let radarChartInstance = null;
+let barChartInstance = null;
+
 function buildRadarChart(scores, names, overallAvg) {
     const ctx = document.getElementById('radarChart');
     if (!ctx) return;
+    if (radarChartInstance) { radarChartInstance.destroy(); radarChartInstance = null; }
     const datasets = [];
     CANDIDATES.forEach((cid, ci) => {
         if (overallAvg[cid] === 0) return;
         datasets.push({
             label: names[cid] || CANDIDATE_LABELS[ci],
-            data: CATEGORIES.map(cat => scores[cid][cat.id]),
+            data: CATEGORIES.map(cat => scores[cid][cat.id] || 0),
             borderColor: COLORS[ci], backgroundColor: COLORS[ci] + '18',
             borderWidth: 3, pointRadius: 6, pointBackgroundColor: COLORS[ci],
             pointBorderColor: '#fff', pointBorderWidth: 2, pointHoverRadius: 8
         });
     });
-    new Chart(ctx, {
+    radarChartInstance = new Chart(ctx, {
         type: 'radar',
         data: {
             labels: CATEGORIES.map(c => { const w = c.name.split(' '); if (w.length <= 3) return c.name; const m = Math.ceil(w.length/2); return [w.slice(0,m).join(' '), w.slice(m).join(' ')]; }),
@@ -539,17 +543,18 @@ function buildRadarChart(scores, names, overallAvg) {
 function buildBarChart(scores, names, overallAvg) {
     const ctx = document.getElementById('barChart');
     if (!ctx) return;
+    if (barChartInstance) { barChartInstance.destroy(); barChartInstance = null; }
     const datasets = [];
     CANDIDATES.forEach((cid, ci) => {
         if (overallAvg[cid] === 0) return;
         datasets.push({
             label: names[cid] || CANDIDATE_LABELS[ci],
-            data: CATEGORIES.map(cat => scores[cid][cat.id]),
+            data: CATEGORIES.map(cat => scores[cid][cat.id] || 0),
             backgroundColor: COLORS[ci] + 'CC', borderColor: COLORS[ci],
             borderWidth: 0, borderRadius: 6, borderSkipped: false
         });
     });
-    new Chart(ctx, {
+    barChartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: CATEGORIES.map(c => { const w = c.name.split(' '); if (w.length <= 2) return c.name; const m = Math.ceil(w.length/2); return [w.slice(0,m).join(' '), w.slice(m).join(' ')]; }),
