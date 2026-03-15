@@ -630,8 +630,17 @@
         .chart-container {
             position: relative;
             width: 100%;
-            max-height: 380px;
             padding: 8px 0;
+        }
+
+        .chart-container.chart-radar {
+            max-width: 900px;
+            margin: 0 auto;
+            aspect-ratio: 1 / 1;
+        }
+
+        .chart-container.chart-bar {
+            max-height: 400px;
         }
 
         /* ─── Observer Entry ─── */
@@ -1199,10 +1208,10 @@ function buildSummary() {
 
     // Charts
     html += '<div class="card"><div class="card-header"><h2>Competency Comparison</h2></div>';
-    html += '<div class="card-body"><div class="chart-container"><canvas id="radarChart"></canvas></div></div></div>';
+    html += '<div class="card-body"><div class="chart-container chart-radar"><canvas id="radarChart"></canvas></div></div></div>';
 
     html += '<div class="card"><div class="card-header"><h2>Score Breakdown by Category</h2></div>';
-    html += '<div class="card-body"><div class="chart-container"><canvas id="barChart"></canvas></div></div></div>';
+    html += '<div class="card-body"><div class="chart-container chart-bar"><canvas id="barChart"></canvas></div></div></div>';
 
     // Per-candidate detail
     CANDIDATES.forEach((cid, ci) => {
@@ -1274,11 +1283,12 @@ function buildRadarChart(scores, names, overallAvg) {
             data: CATEGORIES.map(cat => scores[cid][cat.id]),
             borderColor: COLORS[ci],
             backgroundColor: COLORS[ci] + '18',
-            borderWidth: 2.5,
-            pointRadius: 4,
+            borderWidth: 3,
+            pointRadius: 6,
             pointBackgroundColor: COLORS[ci],
             pointBorderColor: '#fff',
-            pointBorderWidth: 1.5
+            pointBorderWidth: 2,
+            pointHoverRadius: 8
         });
     });
 
@@ -1295,18 +1305,18 @@ function buildRadarChart(scores, names, overallAvg) {
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             scales: {
                 r: {
                     min: 0, max: 5,
-                    ticks: { stepSize: 1, font: { size: 10, family: 'Plus Jakarta Sans' }, backdropColor: 'transparent' },
-                    pointLabels: { font: { size: 10.5, family: 'Plus Jakarta Sans', weight: '600' }, color: '#475467' },
-                    grid: { color: '#e4e7ec' },
-                    angleLines: { color: '#e4e7ec' }
+                    ticks: { stepSize: 1, font: { size: 13, family: 'Plus Jakarta Sans' }, backdropColor: 'transparent', z: 1 },
+                    pointLabels: { font: { size: 14, family: 'Plus Jakarta Sans', weight: '700' }, color: '#1a1a2e', padding: 20 },
+                    grid: { color: '#d0d5dd' },
+                    angleLines: { color: '#d0d5dd' }
                 }
             },
             plugins: {
-                legend: { position: 'bottom', labels: { font: { size: 12, family: 'Plus Jakarta Sans', weight: '600' }, padding: 24, usePointStyle: true, pointStyle: 'rectRounded' } }
+                legend: { position: 'bottom', labels: { font: { size: 14, family: 'Plus Jakarta Sans', weight: '700' }, padding: 28, usePointStyle: true, pointStyle: 'rectRounded' } }
             }
         }
     });
