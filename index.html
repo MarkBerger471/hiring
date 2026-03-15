@@ -857,6 +857,30 @@ const COLORS = ['#1570ef', '#ef6820', '#17b26a', '#7a5af8'];
 let currentSection = 'candidate1';
 let observerName = '';
 let cachedData = { observers: {} };
+
+// ─── Migrate old localStorage data to Firebase (one-time) ───
+(function migrateLocalStorage() {
+    const old = localStorage.getItem('mbmth_eval_data_v2') || localStorage.getItem('mbmth_eval_data');
+    if (!old) return;
+    try {
+        const parsed = JSON.parse(old);
+        if (parsed.observers && Object.keys(parsed.observers).length > 0) {
+            Object.keys(parsed.observers).forEach(obsName => {
+                const key = obsName.replace(/[.#$/\[\]]/g, '_');
+                const obsData = parsed.observers[obsName];
+                obsData.displayName = obsName;
+                db.ref('evaluations/observers/' + key).once('value', snap => {
+                    if (!snap.exists()) {
+                        db.ref('evaluations/observers/' + key).set(obsData);
+                    }
+                });
+            });
+            localStorage.removeItem('mbmth_eval_data_v2');
+            localStorage.removeItem('mbmth_eval_data');
+            console.log('Migrated localStorage data to Firebase');
+        }
+    } catch(e) { console.error('Migration failed', e); }
+})();
 let saveTimer = null;
 
 // ─── Firebase Data Layer ───
