@@ -12,6 +12,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: { sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'] },
@@ -42,17 +43,24 @@
         .badge.complete { background: #12b76a; }
         .badge.partial { background: #f79009; }
         .chart-radar { aspect-ratio: 1/1; max-width: 900px; margin: 0 auto; }
+        /* Dark mode overrides */
+        .dark .pill { background: #1e293b; border-color: #334155; color: #94a3b8; }
+        .dark .pill:hover { border-color: #3b82f6; color: #3b82f6; }
+        .dark .rank-4 { background: #1e293b; color: #64748b; }
         @media print {
             .no-print { display: none !important; }
             .section { display: block !important; }
         }
     </style>
 </head>
-<body class="bg-gray-50 font-sans text-gray-900 antialiased">
+<body class="bg-gray-50 dark:bg-gray-950 font-sans text-gray-900 dark:text-gray-100 antialiased transition-colors duration-300">
 
 <!-- Header -->
 <header class="relative overflow-hidden bg-gradient-to-br from-brand-800 via-brand-600 to-brand-500 text-white py-12 px-6 text-center">
     <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_30%_50%,rgba(255,255,255,0.04),transparent_60%),radial-gradient(ellipse_at_70%_20%,rgba(255,255,255,0.06),transparent_50%)]"></div>
+    <button onclick="toggleDark()" class="absolute top-4 right-6 z-20 w-10 h-10 rounded-xl bg-white/10 hover:bg-white/20 backdrop-blur flex items-center justify-center transition" title="Toggle dark mode">
+        <span class="material-symbols-outlined text-white/70 text-xl dark-icon">dark_mode</span>
+    </button>
     <div class="relative z-10">
         <h1 class="text-3xl md:text-4xl font-extrabold tracking-tight bg-gradient-to-b from-white to-white/80 bg-clip-text text-transparent mb-2">Interview Evaluation Panel</h1>
         <p class="text-sm md:text-base text-white/50 font-medium tracking-widest uppercase">Strategic Assistant – Operational & Financial Excellence, MBMTH</p>
@@ -62,30 +70,35 @@
 </header>
 
 <!-- Nav -->
-<nav class="sticky top-0 z-50 bg-white border-b border-gray-200 no-print">
-    <div class="max-w-7xl mx-auto flex gap-1 px-6 md:px-12 overflow-x-auto scrollbar-hide" id="nav">
-        <button class="active px-5 py-4 text-sm font-semibold text-gray-400 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate1')">Krichasorn J.</button>
-        <button class="px-5 py-4 text-sm font-semibold text-gray-400 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate2')">Panjapat L.</button>
-        <button class="px-5 py-4 text-sm font-semibold text-gray-400 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate3')">Chariya C.</button>
-        <button class="px-5 py-4 text-sm font-semibold text-gray-400 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate4')">Natchayada K.</button>
-        <div class="w-px bg-gray-200 my-2.5 mx-2"></div>
-        <button class="px-5 py-4 text-sm font-semibold text-gray-400 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('summary')">Summary</button>
+<nav class="sticky top-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 no-print transition-colors">
+    <div class="max-w-7xl mx-auto flex items-center gap-1 px-6 md:px-12 overflow-x-auto scrollbar-hide" id="nav">
+        <button class="active px-5 py-4 text-sm font-semibold text-gray-400 dark:text-gray-500 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 dark:hover:text-gray-300 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate1')">Krichasorn J.</button>
+        <button class="px-5 py-4 text-sm font-semibold text-gray-400 dark:text-gray-500 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 dark:hover:text-gray-300 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate2')">Panjapat L.</button>
+        <button class="px-5 py-4 text-sm font-semibold text-gray-400 dark:text-gray-500 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 dark:hover:text-gray-300 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate3')">Chariya C.</button>
+        <button class="px-5 py-4 text-sm font-semibold text-gray-400 dark:text-gray-500 border-b-2 border-transparent whitespace-nowrap transition-all hover:text-gray-600 dark:hover:text-gray-300 [&.active]:text-brand-500 [&.active]:border-brand-500" onclick="showSection('candidate4')">Natchayada K.</button>
+        <div class="w-px bg-gray-200 dark:bg-gray-700 my-2.5 mx-3"></div>
+        <button class="px-8 py-4 text-base font-extrabold text-gray-400 dark:text-gray-500 border-b-3 border-transparent whitespace-nowrap transition-all hover:text-gray-600 dark:hover:text-gray-300 [&.active]:text-brand-500 [&.active]:border-brand-500 uppercase tracking-wide" onclick="showSection('summary')">Summary</button>
     </div>
 </nav>
 
 <!-- Main -->
-<main class="max-w-7xl mx-auto px-4 md:px-12 py-8 pb-16">
+<main class="max-w-7xl mx-auto px-4 md:px-12 py-8 pb-16 transition-colors">
 
     <!-- Observer Bar -->
-    <div class="no-print bg-white/80 backdrop-blur border border-gray-200 rounded-2xl p-6 md:p-7 mb-8 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4">
-        <div class="w-11 h-11 bg-blue-50 rounded-xl flex items-center justify-center text-brand-500 shrink-0">
+    <div class="no-print bg-white/80 dark:bg-gray-900/80 backdrop-blur border border-gray-200 dark:border-gray-800 rounded-2xl p-6 md:p-7 mb-8 shadow-sm flex flex-col md:flex-row items-start md:items-center gap-4 transition-colors">
+        <div class="w-11 h-11 bg-blue-50 dark:bg-brand-500/10 rounded-xl flex items-center justify-center text-brand-500 shrink-0">
             <span class="material-symbols-outlined">person</span>
         </div>
         <div class="flex-1">
-            <label for="observerName" class="block text-sm font-bold text-gray-900 mb-0.5">Observer</label>
-            <p class="text-xs text-gray-400">Enter your name to begin your evaluation</p>
+            <label for="observerName" class="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-0.5">Observer</label>
+            <p class="text-xs text-gray-400 dark:text-gray-500">Select your name to begin</p>
         </div>
-        <input class="w-full md:max-w-xs px-4 py-2.5 border border-gray-200 rounded-lg text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition" type="text" id="observerName" placeholder="Your full name..." />
+        <select class="w-full md:max-w-xs px-4 py-2.5 border border-gray-200 dark:border-gray-700 rounded-lg text-sm text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition appearance-none cursor-pointer" id="observerName">
+            <option value="" disabled selected>Select observer...</option>
+            <option value="Michael">Michael</option>
+            <option value="Anek">Anek</option>
+            <option value="Mark">Mark</option>
+        </select>
         <button class="btn-start px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg border border-brand-500 hover:bg-brand-600 transition" onclick="setObserver()">Begin</button>
     </div>
 
@@ -93,7 +106,7 @@
 </main>
 
 <!-- Toast -->
-<div id="toast" class="fixed bottom-7 right-7 bg-gray-900 text-white px-6 py-3 rounded-xl text-sm font-semibold shadow-2xl transition-all duration-300 translate-y-20 opacity-0 z-[1000] [&.show]:translate-y-0 [&.show]:opacity-100"></div>
+<div id="toast" class="fixed bottom-7 right-7 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 px-6 py-3 rounded-xl text-sm font-semibold shadow-2xl transition-all duration-300 translate-y-20 opacity-0 z-[1000] [&.show]:translate-y-0 [&.show]:opacity-100"></div>
 
 <script>
 // ─── Firebase Init ───
@@ -173,13 +186,30 @@ function showToast(msg) {
     setTimeout(() => t.classList.remove('show'), 2500);
 }
 
+function toggleDark() {
+    document.documentElement.classList.toggle('dark');
+    const icon = document.querySelector('.dark-icon');
+    if (document.documentElement.classList.contains('dark')) {
+        icon.textContent = 'light_mode';
+        localStorage.setItem('theme', 'dark');
+    } else {
+        icon.textContent = 'dark_mode';
+        localStorage.setItem('theme', 'light');
+    }
+}
+// Restore theme preference
+if (localStorage.getItem('theme') === 'dark') {
+    document.documentElement.classList.add('dark');
+    setTimeout(() => { const i = document.querySelector('.dark-icon'); if (i) i.textContent = 'light_mode'; }, 0);
+}
+
 function setObserver() {
-    const input = document.getElementById('observerName');
-    const name = input.value.trim();
-    if (!name) { showToast('Please enter your name'); return; }
+    const select = document.getElementById('observerName');
+    const name = select.value;
+    if (!name) { showToast('Please select your name'); return; }
     observerName = name;
     document.getElementById('evaluationArea').style.display = 'block';
-    input.disabled = true;
+    select.disabled = true;
     const btn = document.querySelector('.btn-start');
     btn.textContent = 'Active';
     btn.disabled = true;
@@ -196,8 +226,8 @@ function buildSections() {
 
     CANDIDATES.forEach((cid, ci) => {
         html += `<div class="section${ci === 0 ? ' active' : ''}" id="section-${cid}">`;
-        html += `<div class="bg-white border border-gray-200 rounded-2xl mb-6 shadow-sm hover:shadow-md transition-all">`;
-        html += `<div class="px-8 py-5 border-b border-gray-100 flex items-center justify-between"><h2 class="text-lg font-extrabold tracking-tight">${CANDIDATE_LABELS[ci]}</h2></div>`;
+        html += `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl mb-6 shadow-sm hover:shadow-md transition-all">`;
+        html += `<div class="px-8 py-5 border-b border-gray-100 dark:border-gray-800/50 flex items-center justify-between"><h2 class="text-lg font-extrabold tracking-tight">${CANDIDATE_LABELS[ci]}</h2></div>`;
         html += `<div class="px-8 py-7">`;
         html += `<input type="hidden" id="name-${cid}" value="${CANDIDATE_LABELS[ci]}"/>`;
 
@@ -205,28 +235,28 @@ function buildSections() {
         CATEGORIES.forEach(cat => {
             if (cat.group !== currentGroup) {
                 currentGroup = cat.group;
-                html += `<div class="text-[0.68rem] font-bold uppercase tracking-widest text-gray-400 pt-4 pb-2 border-b-2 border-gray-100 mb-1">${GROUPS[cat.group]}</div>`;
+                html += `<div class="text-[0.68rem] font-bold uppercase tracking-widest text-gray-400 dark:text-gray-500 pt-4 pb-2 border-b-2 border-gray-100 dark:border-gray-800 mb-1">${GROUPS[cat.group]}</div>`;
             }
-            html += `<div class="grid grid-cols-1 lg:grid-cols-[260px_auto_1fr] gap-4 lg:gap-6 items-start py-4 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 transition-colors lg:-mx-8 lg:px-8 rounded-lg">`;
-            html += `<div><h3 class="text-[0.82rem] font-bold text-gray-900 mb-0.5">${cat.name}</h3><p class="text-[0.7rem] text-gray-400 leading-snug">${cat.desc}</p></div>`;
+            html += `<div class="grid grid-cols-1 lg:grid-cols-[260px_auto_1fr] gap-4 lg:gap-6 items-start py-4 border-b border-gray-50 dark:border-gray-800/50 last:border-0 hover:bg-gray-50/50 dark:hover:bg-gray-800/30 transition-colors lg:-mx-8 lg:px-8 rounded-lg">`;
+            html += `<div><h3 class="text-[0.82rem] font-bold text-gray-900 dark:text-gray-100 mb-0.5">${cat.name}</h3><p class="text-[0.7rem] text-gray-400 dark:text-gray-500 leading-snug">${cat.desc}</p></div>`;
             html += `<div class="flex gap-1.5 pt-0.5" id="stars-${cid}-${cat.id}">`;
             for (let i = 1; i <= 5; i++) {
                 html += `<div class="pill w-[38px] h-[34px] border-[1.5px] border-gray-200 rounded-lg flex items-center justify-center text-[0.78rem] font-bold cursor-pointer transition-all text-gray-400 bg-white hover:border-brand-500 hover:text-brand-500 hover:-translate-y-px hover:shadow-sm select-none" data-value="${i}" onclick="setRating('${cid}','${cat.id}',${i})">${i}</div>`;
             }
             html += `</div>`;
-            html += `<textarea class="w-full px-3 py-2 border-[1.5px] border-gray-200 rounded-lg text-[0.78rem] text-gray-900 placeholder-gray-400 resize-y min-h-[36px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition" id="comment-${cid}-${cat.id}" placeholder="Add comments..." oninput="debouncedSave()"></textarea>`;
+            html += `<textarea class="w-full px-3 py-2 border-[1.5px] border-gray-200 dark:border-gray-700 rounded-lg text-[0.78rem] text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-600 resize-y min-h-[36px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition" id="comment-${cid}-${cat.id}" placeholder="Add comments..." oninput="debouncedSave()"></textarea>`;
             html += `</div>`;
         });
 
-        html += `<div class="mt-6 pt-6 border-t-2 border-gray-100">`;
-        html += `<label class="block text-sm font-bold text-gray-900 mb-1">Overall Assessment</label>`;
-        html += `<p class="text-[0.7rem] text-gray-400 mb-2.5">Overall impression, recommendation, key strengths, concerns or red flags</p>`;
-        html += `<textarea class="w-full px-4 py-3 border-[1.5px] border-gray-200 rounded-lg text-[0.82rem] text-gray-900 placeholder-gray-400 resize-y min-h-[80px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition" id="overall-${cid}" placeholder="Write your overall assessment..." oninput="debouncedSave()"></textarea>`;
+        html += `<div class="mt-6 pt-6 border-t-2 border-gray-100 dark:border-gray-800">`;
+        html += `<label class="block text-sm font-bold text-gray-900 dark:text-gray-100 mb-1">Overall Assessment</label>`;
+        html += `<p class="text-[0.7rem] text-gray-400 dark:text-gray-500 mb-2.5">Overall impression, recommendation, key strengths, concerns or red flags</p>`;
+        html += `<textarea class="w-full px-4 py-3 border-[1.5px] border-gray-200 dark:border-gray-700 rounded-lg text-[0.82rem] text-gray-900 dark:text-gray-100 bg-white dark:bg-gray-800 placeholder-gray-400 dark:placeholder-gray-600 resize-y min-h-[80px] focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/10 transition" id="overall-${cid}" placeholder="Write your overall assessment..." oninput="debouncedSave()"></textarea>`;
         html += `</div>`;
 
         html += `</div></div>`;
         html += `<div class="flex gap-3 justify-end mb-8">`;
-        html += `<button class="px-5 py-2.5 bg-white text-gray-500 text-sm font-semibold rounded-lg border border-gray-200 hover:bg-gray-50 transition" onclick="clearCandidate('${cid}')">Clear</button>`;
+        html += `<button class="px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-500 dark:text-gray-400 text-sm font-semibold rounded-lg border border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700 transition" onclick="clearCandidate('${cid}')">Clear</button>`;
         html += `<button class="px-5 py-2.5 bg-brand-500 text-white text-sm font-semibold rounded-lg border border-brand-500 hover:bg-brand-600 transition" onclick="saveCandidate('${cid}')">Save Evaluation</button>`;
         html += `</div></div>`;
     });
@@ -406,7 +436,7 @@ function buildSummary() {
     html += `<div class="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-6">`;
 
     // Ranking
-    html += `<div class="bg-white border border-gray-200 rounded-2xl p-7 shadow-sm hover:shadow-md transition-all"><h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Candidate Ranking</h3>`;
+    html += `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-7 shadow-sm hover:shadow-md transition-all"><h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Candidate Ranking</h3>`;
     html += `<table class="w-full"><thead><tr class="text-[0.68rem] font-bold uppercase tracking-wider text-gray-400"><th class="text-left pb-3 px-3">Rank</th><th class="text-left pb-3 px-3">Candidate</th><th class="text-left pb-3 px-3">Avg Score</th><th class="text-left pb-3 px-3">Evaluations</th></tr></thead><tbody>`;
     ranked.forEach((cid, i) => {
         if (overallAvg[cid] === 0) return;
@@ -419,7 +449,7 @@ function buildSummary() {
     html += `</tbody></table></div>`;
 
     // Observers
-    html += `<div class="bg-white border border-gray-200 rounded-2xl p-7 shadow-sm hover:shadow-md transition-all"><h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Observers</h3>`;
+    html += `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl p-7 shadow-sm hover:shadow-md transition-all"><h3 class="text-xs font-bold uppercase tracking-widest text-gray-400 mb-4">Observers</h3>`;
     observerKeys.forEach(key => {
         const obs = data.observers[key];
         const ts = new Date(obs.timestamp);
@@ -429,16 +459,16 @@ function buildSummary() {
     html += `</div>`;
 
     // Radar Chart
-    html += `<div class="bg-white border border-gray-200 rounded-2xl mb-6 shadow-sm"><div class="px-8 py-5 border-b border-gray-100"><h2 class="text-base font-extrabold">Competency Comparison</h2></div><div class="p-8"><div class="chart-radar"><canvas id="radarChart"></canvas></div></div></div>`;
+    html += `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl mb-6 shadow-sm"><div class="px-8 py-5 border-b border-gray-100"><h2 class="text-base font-extrabold">Competency Comparison</h2></div><div class="p-8"><div class="chart-radar"><canvas id="radarChart"></canvas></div></div></div>`;
 
     // Bar Chart
-    html += `<div class="bg-white border border-gray-200 rounded-2xl mb-6 shadow-sm"><div class="px-8 py-5 border-b border-gray-100"><h2 class="text-base font-extrabold">Score Breakdown by Category</h2></div><div class="p-8"><div class="max-h-[400px] relative"><canvas id="barChart"></canvas></div></div></div>`;
+    html += `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl mb-6 shadow-sm"><div class="px-8 py-5 border-b border-gray-100"><h2 class="text-base font-extrabold">Score Breakdown by Category</h2></div><div class="p-8"><div class="max-h-[400px] relative"><canvas id="barChart"></canvas></div></div></div>`;
 
     // Per-candidate detail
     CANDIDATES.forEach((cid, ci) => {
         if (overallAvg[cid] === 0) return;
 
-        html += `<div class="bg-white border border-gray-200 rounded-2xl mb-6 shadow-sm">`;
+        html += `<div class="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 rounded-2xl mb-6 shadow-sm">`;
         html += `<div class="px-8 py-5 border-b border-gray-100 flex items-center justify-between"><h2 class="text-base font-extrabold flex items-center gap-2.5"><span class="w-2.5 h-2.5 rounded" style="background:${COLORS[ci]}"></span>${getCandidateLabel(cid)}</h2><span class="text-2xl font-extrabold" style="color:${getScoreColor(overallAvg[cid])}">${overallAvg[cid].toFixed(2)}</span></div>`;
         html += `<div class="px-8 py-7">`;
 
@@ -458,12 +488,12 @@ function buildSummary() {
             CATEGORIES.forEach(cat => {
                 if (c.comments?.[cat.id] && c.comments[cat.id].trim()) {
                     hasComments = true;
-                    html += `<div class="bg-gray-50 border border-gray-100 rounded-xl p-4 mb-2.5 hover:shadow-sm transition"><div class="text-[0.68rem] font-bold text-brand-500 uppercase tracking-wide mb-1">${dn} — ${cat.name}</div><div class="text-xs text-gray-500 leading-relaxed">${escapeHtml(c.comments[cat.id])}</div></div>`;
+                    html += `<div class="bg-gray-50 dark:bg-gray-800/50 border border-gray-100 dark:border-gray-800 rounded-xl p-4 mb-2.5 hover:shadow-sm transition"><div class="text-[0.68rem] font-bold text-brand-500 uppercase tracking-wide mb-1">${dn} — ${cat.name}</div><div class="text-xs text-gray-500 leading-relaxed">${escapeHtml(c.comments[cat.id])}</div></div>`;
                 }
             });
             if (c.overall && c.overall.trim()) {
                 hasComments = true;
-                html += `<div class="bg-blue-50 border border-blue-100 border-l-[3px] border-l-brand-500 rounded-xl p-4 mb-2.5 hover:shadow-sm transition"><div class="text-[0.68rem] font-bold text-brand-500 uppercase tracking-wide mb-1">${dn} — Overall Assessment</div><div class="text-xs text-gray-500 leading-relaxed">${escapeHtml(c.overall)}</div></div>`;
+                html += `<div class="bg-blue-50 dark:bg-brand-500/10 border border-blue-100 dark:border-brand-500/20 border-l-[3px] border-l-brand-500 rounded-xl p-4 mb-2.5 hover:shadow-sm transition"><div class="text-[0.68rem] font-bold text-brand-500 uppercase tracking-wide mb-1">${dn} — Overall Assessment</div><div class="text-xs text-gray-500 leading-relaxed">${escapeHtml(c.overall)}</div></div>`;
             }
         });
 
